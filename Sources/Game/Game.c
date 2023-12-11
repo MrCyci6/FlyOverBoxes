@@ -1,40 +1,43 @@
 // Projet: FlyOverBoxes
-// Author: Cyriac Lenoir : cyriac.lenoir@isen-ouest.yncrea.fr
+// Author: MrCyci6
 // Creation date: 06/12/2023
 // Modification date: 06/12/2023
-// Role: Main
 #include "Game.h"
 
-int waitInput(int timeout) {
+int waitInput(int timeout){
     struct timeval waitingTime;
     fd_set descriptorSet;
     int input = 0;
 
-    FD_ZERO (&descriptorSet);
-    FD_SET (0, &descriptorSet);
+    // Setup input param and timeout
+    FD_ZERO(&descriptorSet);
+    FD_SET(0, &descriptorSet);
     waitingTime.tv_sec = 0;
-    waitingTime.tv_usec = 100000;
+    waitingTime.tv_usec = timeout;
 
-    if (select (1, &descriptorSet, NULL, NULL, &waitingTime) != 0)
-    {
-        fgetc (stdin);
+    // Wait for user input
+
+    if(select(1, &descriptorSet, NULL, NULL, &waitingTime) != 0){
+        fgetc(stdin);
         input = 1;
     }
 
-    usleep (waitingTime.tv_usec);
+    // Wait remaining time (if input)
+    usleep(waitingTime.tv_usec);
+
     return input;
 }
 
-void drawBackground(shistogram histogram, soptions options, int level, int score) {
+void drawBackground(struct s_histogram histogram, struct s_options options, int level, int score) {
     resetCursorColorsAndType();
 
-    if(options.colors == 1) changeCursorForegroundColor("blue");
+    if(options.colors) changeCursorForegroundColor("blue");
     drawXYRectangle(SCREEN_WIDTH, SCREEN_HEIGHT, BORDER_CHAR, 1, 1);
 
-    if(options.colors == 1) changeCursorForegroundColor("magenta");
+    if(options.colors) changeCursorForegroundColor("magenta");
     drawXYHistogram(histogram, 2, SCREEN_HEIGHT);
 
-    if(options.colors == 1) changeCursorForegroundColor("red");
+    if(options.colors) changeCursorForegroundColor("red");
     drawXYText(options.name, 3, 2);
 
     char s[150];
@@ -46,7 +49,7 @@ void drawBackground(shistogram histogram, soptions options, int level, int score
     drawCenteredText(l, 2);
 }
 
-int checkBombCrash(sbomb* bomb, shistogram histogram, soptions options) {
+int checkBombCrash(struct s_bomb* bomb, struct s_histogram histogram, struct s_options options) {
     if(bomb->isActive == 0) return 0;
 
     int binNumber = XYIntersectHistogram(bomb->x, bomb->y, histogram);
@@ -69,7 +72,7 @@ int checkBombCrash(sbomb* bomb, shistogram histogram, soptions options) {
     }
 }
 
-int checkPlaneCrash(splane* plane, shistogram histogram) {
+int checkPlaneCrash(struct s_plane* plane, struct s_histogram histogram) {
     if(plane->orientation == 1) {
         if(XYIntersectHistogram(plane->x + plane->image.width, plane->y + plane->image.height, histogram) != -1) {
             return 1;
@@ -85,58 +88,74 @@ int checkPlaneCrash(splane* plane, shistogram histogram) {
     }
 }
 
-int runLevel(int level, soptions options, int* score) {
-    shistogram histogram;
-    if(options.difficulty == 1) histogram = generateHistogram(WIDTH_LEVEL1, HEIGHT_LEVEL123, 'I');
-    if(options.difficulty == 2) histogram = generateHistogram(WIDTH_LEVEL2, HEIGHT_LEVEL123, 'I');
-    if(options.difficulty == 3) histogram = generateHistogram(WIDTH_LEVEL3, HEIGHT_LEVEL123, 'I');
+int runLevel(int level, struct s_options options, int* score) {
+    struct s_histogram histogram;
+    if(options.difficulty == 1) {
+        histogram = generateHistogram(WIDTH_LEVEL1, HEIGHT_LEVEL123, 'I');
+    } else if(options.difficulty == 2) {
+        histogram = generateHistogram(WIDTH_LEVEL2, HEIGHT_LEVEL123, 'I');
+    } else {
+        histogram = generateHistogram(WIDTH_LEVEL3, HEIGHT_LEVEL123, 'I');
+    }
 
-    splane plane;
+    struct s_plane plane;
     plane = initializePlane(options, level);
 
-    sbomb bomb;
+    struct s_bomb bomb;
     bomb.isPowerup = 0;
     bomb.isActive = 0;
+
+    if(options.powerup && (rand()%5) == 1){
+        bomb.isPowerup = 1;
+    }
+    else{
+        bomb.isPowerup = 0;
+    }
+
     drawBackground(histogram, options, level, *score);
 
     while(1) {
         drawPlane(plane, 0, options);
         drawBomb(bomb, 0, options);
 
-        if (waitInput (500000) == 1 && !bomb.isActive)
-            bomb = initializeBomb (bomb.isPowerup,
-                                   plane.x + plane.image.width/2,
-                                   plane.y + plane.image.height,
-                                   options, level);
+        if (waitInput (50000) == 1 && !bomb.isActive) {
+            bomb = initializeBomb(bomb.isPowerup,
+                                  plane.x + plane.image.width / 2,
+                                  plane.y + plane.image.height,
+                                  options, level);
+        }
 
-        drawPlane(plane, 1, options);
-        drawBomb(bomb, 1, options);
-
-        updatePlanePosition(&plane);
-        updateBombPosition(&bomb);
-
-        if(checkBombCrash(&bomb, histogram, options) == 1) {
+        if(checkBombCrash(&bomb, histogram, options)) {
             *score = *score + options.difficulty * (level + 1) * BASE_SCORE;
             drawBackground(histogram, options, level, *score);
-            if(bomb.isPowerup == 1) {
+            if(bomb.isPowerup) {
                 drawCenteredText("POWERUP\n", 3);
             }
         }
 
         if(checkPlaneCrash(&plane, histogram)) return 1;
         if(isEmpty(histogram)) return 0;
+
+        drawPlane(plane, 1, options);
+        updatePlanePosition(&plane);
+
+        if(bomb.isActive) {
+            drawBomb(bomb, 1, options);
+            updateBombPosition(&bomb);
+        }
     }
 }
 
-void runGame(soptions options) {
-    int level = 0;
-    int score = 0;
-    int stop;
+void runGame(struct s_options options) {
+    int level = 0, score = 0, stop = 0;
 
     while(stop != 1) {
         stop = runLevel(level, options, &score);
         level++;
-        drawCenteredText("Press any key to continue", SCREEN_HEIGHT - 3);
+
+        char str[150];
+        sprintf(str, "Press any key for step to level  %d\n", level);
+        drawCenteredText(str, SCREEN_HEIGHT - 15);
         fgetc(stdin);
     }
 }

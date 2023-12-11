@@ -1,8 +1,7 @@
 // Projet: FlyOverBoxes
-// Author: Cyriac Lenoir : cyriac.lenoir@isen-ouest.yncrea.fr
+// Author: MrCyci6
 // Creation date: 06/12/2023
 // Modification date: 06/12/2023
-// Role: Main
 #include "Drawing.h"
 
 void clearScreen() {
@@ -129,21 +128,6 @@ void drawText(char* text) {
 void drawXYText(char* text, int x, int y) {
     setCursorPosition(x, y);
     drawText(text);
-}
-
-void drawXYImage(simage image, int x, int y, int empty) {
-    int h, w;
-
-    for(h = 0; h < image.height; h++) {
-        setCursorPosition(x, y + h);
-        for(w = 0; w < image.width; w++) {
-            if(empty == 1) {
-                printf(" ");
-            } else {
-                printf("%c", image.data[h][w]);
-            }
-        }
-    }
 }
 
 void drawXYHistogram(shistogram histogram, int x, int y) {

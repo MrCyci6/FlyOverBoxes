@@ -1,8 +1,7 @@
 // Projet: FlyOverBoxes
-// Author: Cyriac Lenoir : cyriac.lenoir@isen-ouest.yncrea.fr
+// Author: MrCyci6
 // Creation date: 06/12/2023
 // Modification date: 06/12/2023
-// Role: Main
 #include "Image.h"
 
 char mirrorChar(char character) {
@@ -28,7 +27,7 @@ char mirrorChar(char character) {
     }
 }
 
-void flipImage (simage* image) {
+void flipImage (struct s_image* image) {
     for(int i = 0; i < image->height; i++) {
         for(int j = 0; j < image->width/2; j++) {
             char temp = image->data[i][j];
@@ -44,8 +43,22 @@ void flipImage (simage* image) {
     }
 }
 
-simage readImage(char* filename) {
-    simage image;
+void drawXYImage(struct s_image image, int x, int y, int empty) {
+    int h, w;
+
+    for(h = 0; h < image.height; h++) {
+        for(w = 0; w < image.width; w++) {
+            if(empty) {
+                drawXYText(" ", w + x, h + y);
+            } else {
+                drawXYText(&image.data[h][w], w + x, h + y);
+            }
+        }
+    }
+}
+
+struct s_image readImage(char* filename) {
+    struct s_image image;
     int x;
     int y;
     FILE* file;
@@ -71,9 +84,9 @@ simage readImage(char* filename) {
     return image;
 }
 
-void deleteImage(simage image) {
-    for (int i = 0; i < image.height; i++) {
-        free(image.data[i]);
+void deleteImage(struct s_image* image) {
+    for (int i = 0; i < image->height; i++) {
+        free(image->data[i]);
     }
-    free(image.data);
+    free(image->data);
 }

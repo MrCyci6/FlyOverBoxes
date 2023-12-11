@@ -1,8 +1,7 @@
 // Projet: FlyOverBoxes
-// Author: Cyriac Lenoir : cyriac.lenoir@isen-ouest.yncrea.fr
+// Author: MrCyci6
 // Creation date: 06/12/2023
 // Modification date: 06/12/2023
-// Role: Options
 #include "Options.h"
 
 soptions getDefaultOptions() {

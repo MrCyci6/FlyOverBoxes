@@ -1,8 +1,7 @@
 // Projet: FlyOverBoxes
-// Author: Cyriac Lenoir : cyriac.lenoir@isen-ouest.yncrea.fr
+// Author: MrCyci6
 // Creation date: 06/12/2023
 // Modification date: 06/12/2023
-// Role: Main
 #include "Menu.h"
 
 void displayDifficultyOption(int difficulty, int y) {
@@ -143,7 +142,7 @@ void displayHelp() {
 }
 
 void displayMenu(soptions* options) {
-    simage image;
+    struct s_image image;
 
     do {
         clearScreen();

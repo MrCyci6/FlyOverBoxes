@@ -1,16 +1,16 @@
 // Projet: FlyOverBoxes
-// Author: Cyriac Lenoir : cyriac.lenoir@isen-ouest.yncrea.fr
+// Author: MrCyci6
 // Creation date: 06/12/2023
 // Modification date: 06/12/2023
-// Role: Main
 #include "Bomb.h"
 
-sbomb initializeBomb(int isPowerup, int x, int y, soptions options, int level) {
-    sbomb bomb;
+struct s_bomb initializeBomb(int isPowerup, int x, int y, struct s_options options, int level) {
+    struct s_bomb bomb;
 
-    bomb.x = (float) x;
-    bomb.y = (float) y;
-    bomb.speed = 1 +  ((float) level/2);
+    bomb.x = x;
+    bomb.y = y;
+    bomb.speed = 1.0 +  ((float) level/2);
+    bomb.isPowerup = isPowerup;
     bomb.character = isPowerup == 1 ? '!' : '*';
     bomb.isActive = 1;
 
@@ -21,7 +21,7 @@ void drawBomb(sbomb bomb, int clear, soptions options) {
     char buffer[8];
 
     if(bomb.isActive != 1) return;
-    if(options.colors == 1) changeCursorBackgroundColor("blue");
+    if(options.colors == 1) changeCursorForegroundColor("blue");
 
     sprintf (buffer, "%c\n", bomb.character);
 
@@ -30,6 +30,7 @@ void drawBomb(sbomb bomb, int clear, soptions options) {
     } else {
         drawXYText(buffer, bomb.x, bomb.y);
     }
+    resetCursorColorsAndType();
 }
 
 void updateBombPosition(sbomb* bomb) {

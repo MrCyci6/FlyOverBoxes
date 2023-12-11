@@ -1,8 +1,7 @@
 // Projet: FlyOverBoxes
-// Author: Cyriac Lenoir : cyriac.lenoir@isen-ouest.yncrea.fr
+// Author: MrCyci6
 // Creation date: 06/12/2023
 // Modification date: 06/12/2023
-// Role: Inclusions
 
 #ifndef INCLUDES_H
 #define INCLUDES_H
@@ -12,16 +11,15 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-#include "Game/Game.h"
 
 #define MAX_STRING_SIZE 256
-#define SCREEN_WIDTH 167
-#define SCREEN_HEIGHT 38
-#define DEFAULT_DIFFICULTY 2
+#define SCREEN_WIDTH 122
+#define SCREEN_HEIGHT 40
+#define DEFAULT_DIFFICULTY 1
 #define DEFAULT_PLANETYPE 2
 #define DEFAULT_POWERUP 1
 #define DEFAULT_COLORS 1
-#define DEFAULT_NAME "ISEN Player"
+#define DEFAULT_NAME "MrCyci6"
 #define DEFAULT_HELP 0
 #define BORDER_CHAR '#'
 #define BOX_HEIGHT 3
